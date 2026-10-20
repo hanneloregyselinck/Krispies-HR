@@ -38,9 +38,9 @@ export function verificationPanel() {
     files: [],
     embeds: [
       new EmbedBuilder().setColor(0x292d30).setTitle('Staff verification')
-        .setDescription('Welcome to Krispies! Press **Verify** below to complete your staff verification.\n\n'
+        .setDescription('Welcome to Krispies HR! Press **Verify** below to complete your staff verification.\n\n'
           + 'Please provide your **Roblox username**, **rank**, **timezone**, and **who invited you**. You can also attach an optional screenshot.\n\n'
-          + 'Our HR team will review your submission.'),
+          + 'Our Leadership team will review your submission.'),
     ],
     components: [row(button('verification:open', 'Verify'))],
     allowedMentions: { parse: [] },
