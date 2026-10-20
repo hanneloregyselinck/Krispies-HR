@@ -3,7 +3,7 @@ import { config } from './config.js';
 import { db, staff, mutate, event, pending, consume } from './store.js';
 import { roblox, lookupRoblox, groupRank, seriesProgress, terminateWithBloxrank } from './integrations.js';
 import { activeLoa, consequenceAllowed, validatePeriod, evaluate } from './domain.js';
-import { button, row, summary, history, verificationModal, safe, textPayload, recentConsequences } from './ui.js';
+import { button, row, summary, history, verificationModal, verificationPanel, safe, textPayload, recentConsequences } from './ui.js';
 import { loaReasonModal, loaService, pollLoas, deliverLoaPanels } from './loa.js';
 
 export async function authorize(i, cohead = false) {
@@ -89,7 +89,7 @@ export async function handle(i) {
     const c = await channel(i.client, config.verification);
     const panels = db.collection('settings');
     const prior = await panels.findOne({ _id: 'verificationPanel' });
-    const payload = { content: '**Staff verification**\nPress Verify to submit your username, rank, timezone, inviter, and optional screenshot. HR will review your submission.', components: [row(button('verification:open', 'Verify'))], allowedMentions: { parse: [] } };
+    const payload = verificationPanel();
     let message;
     if (prior?.channelId === c.id) message = await c.messages.fetch(prior.messageId).catch(() => null);
     message = message ? await message.edit(payload) : await c.send(payload);

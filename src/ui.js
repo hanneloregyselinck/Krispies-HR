@@ -1,4 +1,5 @@
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
+import { fileURLToPath } from 'node:url';
 import { activeLoa, TERMINATION_WARNING } from './domain.js';
 export const button = (id, label, style = ButtonStyle.Primary) => new ButtonBuilder().setCustomId(id).setLabel(label).setStyle(style);
 export const row = (...buttons) => new ActionRowBuilder().addComponents(...buttons);
@@ -28,6 +29,26 @@ export function verificationModal() {
       })),
       { type: 18, label: 'Screenshot (optional)', component: { type: 19, custom_id: 'screenshot', min_values: 0, max_values: 1, required: false } },
     ],
+  };
+}
+export function verificationPanel() {
+  return {
+    content: null,
+    attachments: [],
+    files: [
+      new AttachmentBuilder(fileURLToPath(new URL('../assets/verification-header.png', import.meta.url)), { name: 'verification-header.png' }),
+      new AttachmentBuilder(fileURLToPath(new URL('../assets/verification-footer.png', import.meta.url)), { name: 'verification-footer.png' }),
+    ],
+    embeds: [
+      new EmbedBuilder().setColor(0x292d30).setImage('attachment://verification-header.png'),
+      new EmbedBuilder().setColor(0x292d30).setTitle('Staff verification')
+        .setDescription('Welcome to Krispies! Press **Verify** below to complete your staff verification.\n\n'
+          + 'Please provide your **Roblox username**, **rank**, **timezone**, and **who invited you**. You can also attach an optional screenshot.\n\n'
+          + 'Our HR team will review your submission.')
+        .setImage('attachment://verification-footer.png'),
+    ],
+    components: [row(button('verification:open', 'Verify'))],
+    allowedMentions: { parse: [] },
   };
 }
 export function history(staff, page = 0) {
