@@ -3,7 +3,7 @@ import { config } from './config.js';
 import { db, staff, mutate, event, pending, consume } from './store.js';
 import { roblox, lookupRoblox, groupRank, seriesProgress, terminateWithBloxrank } from './integrations.js';
 import { activeLoa, consequenceAllowed, validatePeriod, evaluate } from './domain.js';
-import { button, row, summary, history, verificationModal, verificationPanel, safe, textPayload, recentConsequences } from './ui.js';
+import { button, row, summary, history, verificationModal, verificationPanel, verificationImage, safe, textPayload, recentConsequences } from './ui.js';
 import { loaReasonModal, loaService, pollLoas, deliverLoaPanels } from './loa.js';
 
 export async function authorize(i, cohead = false) {
@@ -89,11 +89,31 @@ export async function handle(i) {
     const c = await channel(i.client, config.verification);
     const panels = db.collection('settings');
     const prior = await panels.findOne({ _id: 'verificationPanel' });
-    const payload = verificationPanel();
-    let message;
-    if (prior?.channelId === c.id) message = await c.messages.fetch(prior.messageId).catch(() => null);
-    message = message ? await message.edit(payload) : await c.send(payload);
-    await panels.updateOne({ _id: 'verificationPanel' }, { $set: { channelId: c.id, messageId: message.id } }, { upsert: true });
+    const ids = [prior?.headerId, prior?.messageId, prior?.footerId];
+    const existing = [];
+    if (prior?.channelId === c.id) for (const id of ids) {
+      if (!id) { existing.push(null); continue; }
+      try { existing.push(await c.messages.fetch(id)); }
+      catch (error) { if (error.code !== 10008) throw error; existing.push(null); }
+    }
+    const payloads = [verificationImage('header'), verificationPanel(), verificationImage('footer')];
+    const messages = [];
+    if (existing.length === 3 && existing.every(Boolean)) {
+      for (let n = 0; n < 3; n++) messages.push(await existing[n].edit(payloads[n]));
+    } else {
+      // Rebuild the set in order when upgrading the old single-message panel.
+      try { for (const payload of payloads) messages.push(await c.send(payload)); }
+      catch (error) {
+        for (const message of messages) await message.delete().catch(() => {});
+        throw error;
+      }
+    }
+    await panels.updateOne({ _id: 'verificationPanel' }, { $set: {
+      channelId: c.id, headerId: messages[0].id, messageId: messages[1].id, footerId: messages[2].id,
+    } }, { upsert: true });
+    for (const message of existing.filter(Boolean)) {
+      if (!messages.some(current => current.id === message.id)) await message.delete();
+    }
     return i.editReply('Verification panel posted.');
   }
   if (name === 'adjustreqs') {

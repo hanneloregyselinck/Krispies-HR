@@ -34,7 +34,7 @@ Set `MR_RANK_NAMES` to the comma-separated exact Roblox group rank names eligibl
 
 ## Verification
 
-The verification panel uses the bundled images in `assets/`: the #Verification banner appears first, followed by the instructions and the Krispies footer banner. Run `/verificationpanel` again after restarting the bot to update the existing panel.
+The verification panel uses three messages: the #Verification image as a standalone attachment, the text embed with its Verify button, then the standalone Krispies footer image. Images are bundled in `assets/`. Run `/verificationpanel` after restarting to replace the old layout; subsequent runs update the saved messages.
 
 The form accepts one optional image up to 10 MB. Submissions are stored in MongoDB and posted to the private review channel with an attached copy of the screenshot. HR can mark reviewed or enable resubmission. The form collects self-reported details; it is not Roblox ownership verification and does not grant roles. Submitted rank never controls bot permissions or quota rules.
 

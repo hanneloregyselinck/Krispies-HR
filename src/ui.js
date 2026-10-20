@@ -35,21 +35,23 @@ export function verificationPanel() {
   return {
     content: null,
     attachments: [],
-    files: [
-      new AttachmentBuilder(fileURLToPath(new URL('../assets/verification-header.png', import.meta.url)), { name: 'verification-header.png' }),
-      new AttachmentBuilder(fileURLToPath(new URL('../assets/verification-footer.png', import.meta.url)), { name: 'verification-footer.png' }),
-    ],
+    files: [],
     embeds: [
-      new EmbedBuilder().setColor(0x292d30).setImage('attachment://verification-header.png'),
       new EmbedBuilder().setColor(0x292d30).setTitle('Staff verification')
         .setDescription('Welcome to Krispies! Press **Verify** below to complete your staff verification.\n\n'
           + 'Please provide your **Roblox username**, **rank**, **timezone**, and **who invited you**. You can also attach an optional screenshot.\n\n'
-          + 'Our HR team will review your submission.')
-        .setImage('attachment://verification-footer.png'),
+          + 'Our HR team will review your submission.'),
     ],
     components: [row(button('verification:open', 'Verify'))],
     allowedMentions: { parse: [] },
   };
+}
+export function verificationImage(position) {
+  if (!['header', 'footer'].includes(position)) throw new Error('Invalid verification image position.');
+  const name = `verification-${position}.png`;
+  return { content: null, embeds: [], components: [], attachments: [],
+    files: [new AttachmentBuilder(fileURLToPath(new URL(`../assets/${name}`, import.meta.url)), { name })],
+    allowedMentions: { parse: [] } };
 }
 export function history(staff, page = 0) {
   const events = [...staff.events].reverse(), pages = Math.max(1, Math.ceil(events.length / 5));
